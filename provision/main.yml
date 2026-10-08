@@ -1,0 +1,56 @@
+# Builds the ADLab (xbufu) lab on dc01, from the controller: promote a new forest
+# (bufu-sec.local, the domain upstream's README uses), then run upstream's module unchanged:
+# Invoke-ADLabFill (groups, OUs and users) and the attack vectors that apply to a single
+# domain controller, each with its defaults: Set-Kerberoasting, Set-BadACLs, Set-PSRemoting.
+# Set-ASREPRoasting is not called: upstream's version never sets the flag (its `else` is
+# missing, so the user list stays empty, and its -Users branch reads an undefined $User).
+- name: ADLab domain controller
+  hosts: dc
+  gather_facts: false
+  vars:
+    domain: bufu-sec.local
+    netbios: BUFU-SEC
+    # The domain's built-in Administrator (and the DSRM password). Promotion needs one set.
+    admin_password: "Bufu!Forest#2025lab"
+  tasks:
+    - name: Local Administrator password (becomes the domain Administrator's)
+      ansible.windows.win_user:
+        name: Administrator
+        password: "{{ admin_password }}"
+        password_never_expires: true
+
+    - name: AD DS role
+      ansible.windows.win_feature:
+        name: AD-Domain-Services
+        include_management_tools: true
+
+    - name: New forest {{ domain }}
+      microsoft.ad.domain:
+        dns_domain_name: "{{ domain }}"
+        domain_netbios_name: "{{ netbios }}"
+        safe_mode_password: "{{ admin_password }}"
+        reboot: true
+
+    - name: Wait for Active Directory Web Services
+      ansible.windows.win_shell: Get-ADDomain | Select-Object -ExpandProperty DNSRoot
+      register: addomain
+      until: addomain.rc == 0 and domain in addomain.stdout
+      retries: 30
+      delay: 20
+
+    - name: Upstream module
+      ansible.windows.win_copy:
+        src: ../ADLab/
+        dest: C:\ADLab\
+
+    - name: Fill the domain and set the attack vectors
+      ansible.windows.win_shell: |
+        Import-Module C:\ADLab\ADLab.psm1 -DisableNameChecking
+        Invoke-ADLabFill -Verbose
+        Set-Kerberoasting -Verbose
+        Set-BadACLs -Verbose
+        Set-PSRemoting -Verbose
+        New-Item -ItemType File -Force C:\ADLab\done | Out-Null
+      args:
+        chdir: C:\ADLab\Content
+        creates: C:\ADLab\done

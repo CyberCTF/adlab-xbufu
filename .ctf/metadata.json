@@ -1,0 +1,17 @@
+{
+  "title": "ADLab (xbufu)",
+  "description": "A single Windows Server 2019 domain controller for bufu-sec.local built by xbufu's ADLab module: random users in three groups with weak passwords, Kerberoastable accounts, and a GenericAll ACL chain from ordinary users up to Domain Admins.",
+  "question": "Compromise the bufu-sec.local domain and reach Domain Admin.",
+  "category": "NETWORK",
+  "difficulty": 2,
+  "evidence_kind": "SECRET",
+  "capabilities": ["active-directory", "password-spraying", "kerberoasting", "acl-abuse", "password-cracking"],
+  "providers": [
+    "virtualbox",
+    "vmware_desktop",
+    "parallels",
+    "vmware_esxi",
+    "aws",
+    "azure"
+  ]
+}
