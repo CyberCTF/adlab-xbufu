@@ -8,6 +8,9 @@
 version: 1
 name: adlab-xbufu
 
+# Given by the CyberCTF launcher: this player's flag. Without it the development flag.
+inputs: [CTF_FLAG_MAIN]
+
 networks:
   lab: { cidr: 10.60.86.0/24 }
 
@@ -22,8 +25,12 @@ machines:
       - { port: 445, name: smb }
       - { port: 5985, name: winrm }
     resources: { cpus: 2, memory_mb: 3072 }
+    inputs: [CTF_FLAG_MAIN]
     vm:
       os: windows-server-2019
+      # The player's flag in C:\ctf\flag.txt, before the playbook: readable by Administrators
+      # and SYSTEM only, which on a domain controller means Domain Admin.
+      provision: [provision/flag.ps1]
 
 provision:
   - ansible: provision/main.yml
@@ -42,3 +49,4 @@ message: |
   ADLab is up: dc01, the domain controller of bufu-sec.local, at {{ machines.dc01.addresses.lab }}.
   Users are random on every build. Spray or roast your way to a first account, then follow the
   ACLs from the Normies to the Domain Admins.
+  Domain Admin reads the flag in C:\ctf\flag.txt on dc01.

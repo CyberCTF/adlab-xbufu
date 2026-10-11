@@ -3,7 +3,9 @@
   "resolved_version": 1,
   "name": "adlab-xbufu",
   "instance": null,
-  "inputs": [],
+  "inputs": [
+    "CTF_FLAG_MAIN"
+  ],
   "networks": {
     "lab": {
       "cidr": "10.60.86.0/24",
@@ -71,7 +73,9 @@
         }
       ],
       "depends_on": [],
-      "inputs": [],
+      "inputs": [
+        "CTF_FLAG_MAIN"
+      ],
       "volumes": {},
       "resources": {
         "cpus": 2,
@@ -173,5 +177,5 @@
       }
     ]
   },
-  "message": "ADLab is up: dc01, the domain controller of bufu-sec.local, at 10.60.86.10.\nUsers are random on every build. Spray or roast your way to a first account, then follow the\nACLs from the Normies to the Domain Admins.\n"
+  "message": "ADLab is up: dc01, the domain controller of bufu-sec.local, at 10.60.86.10.\nUsers are random on every build. Spray or roast your way to a first account, then follow the\nACLs from the Normies to the Domain Admins.\nDomain Admin reads the flag in C:\\ctf\\flag.txt on dc01.\n"
 }
